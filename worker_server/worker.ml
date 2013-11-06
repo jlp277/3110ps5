@@ -25,7 +25,8 @@ let rec handle_request client =
             if send_response client (Mapper(Some id, "")) then (
               Mutex.lock m_mutex;
               Hashtbl.add mappers id "";
-              Mutex.unlock m_mutex )
+              Mutex.unlock m_mutex;
+              handle_request client )
             else
               () )
           | None, error ->
@@ -36,7 +37,8 @@ let rec handle_request client =
             if send_response client (Reducer(Some id, "")) then (
               Mutex.lock r_mutex;
               Hashtbl.add reducers id "";
-              Mutex.unlock r_mutex )
+              Mutex.unlock r_mutex;
+              handle_request client ) 
             else
               () ) 
           | None, error -> 
