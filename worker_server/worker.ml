@@ -1,5 +1,11 @@
 open Protocol
 
+let mappers = Hashtbl.create 256
+let reducers = Hashtbl.create 256
+
+let m_mutex = Mutex.create ()
+let r_mutex = Mutex.create ()
+
 let send_response client response =
   let success = Connection.output client response in
     (if not success then
@@ -10,19 +16,36 @@ let send_response client response =
 
 let rec handle_request client =
   match Connection.input client with
-    Some v ->
+  | Some v ->
       begin
-        match v with
+        (match v with
         | InitMapper source -> 
-          failwith "It's been a long time, old one."
+          (match Program.build source with
+          | Some id, _ -> (
+            if send_response client (Mapper(Some id, "")) then (
+              Mutex.lock m_mutex;
+              Hashtbl.add mappers id "";
+              Mutex.unlock m_mutex )
+            else
+              () )
+          | None, error ->
+            let _ = send_response client error in () )
         | InitReducer source -> 
-          failwith "Young master, I cannot aid one who opposes the Master!"
+          (match Program.build source with
+          | Some id, _ -> (
+            if send_response client (Reducer(Some id, "")) then (
+              Mutex.lock r_mutex;
+              Hashtbl.add reducers id "";
+              Mutex.unlock r_mutex )
+            else
+              () ) 
+          | None, error -> 
+            let _ = send_response client error in () )
         | MapRequest (id, k, v) -> 
           failwith "You won't go unrewarded."
         | ReduceRequest (id, k, v) -> 
-          failwith "Really? In that case, just tell me what you need."
+          failwith "Really? In that case, just tell me what you need.")
       end
   | None ->
       Connection.close client;
       print_endline "Connection lost while waiting for request."
-
