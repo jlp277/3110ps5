@@ -59,7 +59,21 @@ let rec handle_request client =
           else
             let _ = send_response client (InvalidWorker(id)) in ()
         | ReduceRequest (id, k, v) -> 
-          failwith "Really? In that case, just tell me what you need.")
+          (*TODO What is key k for?*)
+          if (Hashtbl.mem reducers id) then
+            match Program.run id v with
+            |Some result -> (
+              (*TODO Should we remove the id from the hashtable somewhere in here?*)
+              if send_response client (ReduceResults(id,result)) then
+                handle_request client
+              else
+                () )
+            |None ->
+              (*TODO should we recursively call here as well?*)
+              let _ = send_response client (RuntimeError(id, "No Result")) in ()
+          else
+            let _ = send_response client (InvalidWorker(id)) in ()
+        )
       end
   | None ->
       Connection.close client;
