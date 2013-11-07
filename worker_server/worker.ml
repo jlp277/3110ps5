@@ -43,8 +43,21 @@ let rec handle_request client =
               () ) 
           | None, error -> 
             let _ = send_response client error in () )
-        | MapRequest (id, k, v) -> 
-          failwith "You won't go unrewarded."
+        | MapRequest (id, k, v) ->
+          (*TODO What is key k for?*)
+          if (Hashtbl.mem mappers id) then
+            match Program.run id v with
+            |Some result -> (
+              (*TODO Should we remove the id from the hashtable somewhere in here?*)
+              if send_response client (MapResults(id,result)) then
+                handle_request client
+              else
+                () )
+            |None ->
+              (*TODO should we recursively call here as well?*)
+              let _ = send_response client (RuntimeError(id, "No Result")) in ()
+          else
+            let _ = send_response client (InvalidWorker(id)) in ()
         | ReduceRequest (id, k, v) -> 
           failwith "Really? In that case, just tell me what you need.")
       end
