@@ -38,13 +38,13 @@ val push_worker : 'a worker_manager -> 'a -> unit
 val map : mapper -> string -> string -> (string * string) list option
 (**
  * [map worker key value]: sends a map request to the provided mapper with the
- *   (`key`, [value`) pair as input. 
+ *   (`key`, `value`) pair as input. 
  *   The function then blocks until the mapper responds.
  * Thread-safe
  * Returns: [Some l] where [l] is a list of the 
  *   (key, value) pairs computed by the mapper, 
  *   or [None] if the mapper experienced an error 
- *)
+ *)	
 
 val reduce : reducer -> string -> string list -> string list option
 (**

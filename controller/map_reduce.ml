@@ -1,9 +1,39 @@
 open Util
 open Worker_manager
 
+let c_mutex = Mutex.create ()
+
 (* TODO implement these *)
 let map kv_pairs map_filename : (string * string) list = 
-  failwith "These quotes suck"
+  (* create threadpool *)
+  let to_combine = [] in
+  let m_pool = Thread_pool.create 20 in
+  let manager = Worker_manager.initialize_mappers map_filename in
+  let todo = kv_pairs in
+  (* create todo list *)
+  let map_pair (k,v) () =
+    let mapper = Worker_manager.pop_worker manager in
+    match Worker_manager.map mapper k v with
+    | Some l ->
+      Worker_manager.push_worker manager mapper;
+      Mutex.lock c_mutex;
+      l :: to_combine
+      (* check off todo *)
+      Mutex.unlock c_mutex;
+    | None -> 
+  
+  List.iter (fun (k,v) -> m_pool.add_work (map_pair (k,v)) ()) kv_pairs
+  (* iterate over todo list
+   head of list
+   Threadpool assign work
+
+   repeat *)
+  let rec todo_iter =
+    match todo with
+    | [] -> failwith "done"
+    | h::t ->
+      (* assign h to worker via thread *)
+  in
 
 let combine kv_pairs : (string * string list) list = 
   failwith "You have been doomed ever since you lost the ability to love."

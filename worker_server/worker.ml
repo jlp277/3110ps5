@@ -45,30 +45,35 @@ let rec handle_request client =
             let _ = send_response client error in () )
         | MapRequest (id, k, v) ->
           (*TODO What is key k for?*)
-          if (Hashtbl.mem mappers id) then
-            match Program.run id v with
-            |Some result -> (
+          Mutex.lock m_mutex;
+          if (Hashtbl.mem mappers id) then (
+            Mutex.unlock m_mutex;
+            (******************************)
+            match Program.run id (k,v) with
+            (******************************)
+            | Some result -> (
               (*TODO Should we remove the id from the hashtable somewhere in here?*)
               if send_response client (MapResults(id,result)) then
                 handle_request client
               else
                 () )
-            |None ->
+            | None ->
               (*TODO should we recursively call here as well?*)
-              let _ = send_response client (RuntimeError(id, "No Result")) in ()
-          else
-            let _ = send_response client (InvalidWorker(id)) in ()
+              let _ = send_response client (RuntimeError(id, "No Result")) in () )
+          else (
+            Mutex.unlock m_mutex;
+            let _ = send_response client (InvalidWorker(id)) in () )
         | ReduceRequest (id, k, v) -> 
           (*TODO What is key k for?*)
           if (Hashtbl.mem reducers id) then
-            match Program.run id v with
-            |Some result -> (
+            match Program.run id (k,v) with
+            | Some result -> (
               (*TODO Should we remove the id from the hashtable somewhere in here?*)
               if send_response client (ReduceResults(id,result)) then
                 handle_request client
               else
                 () )
-            |None ->
+            | None ->
               (*TODO should we recursively call here as well?*)
               let _ = send_response client (RuntimeError(id, "No Result")) in ()
           else
