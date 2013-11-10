@@ -11,7 +11,7 @@ let map kv_pairs map_filename : (string * string) list =
   let m_pool = Thread_pool.create 20 in
   let manager = Worker_manager.initialize_mappers map_filename in
   let rec assign =
-    let map_pair (k,v) () =
+    let map_pair () =
       let mapper = Worker_manager.pop_worker manager in
       match Worker_manager.map mapper k v with
       | Some l ->
@@ -26,7 +26,7 @@ let map kv_pairs map_filename : (string * string) list =
     else
       Thread.delay 0.1;
       (* marshalling may not be type safe. check if this implementation is correct *)
-      Hashtbl.iter (fun (k,v) -> Thread_pool.add_work (map_pair (Util.marshal k, Util.marshal v) ()) m_pool) todo in
+      Hashtbl.iter (fun (k,v) -> Thread_pool.add_work (map_pair (Util.marshal k, Util.marshal v)) m_pool) todo in
   List.iter (fun (k,v) -> (Hashtbl.add todo k v)) kv_pairs;
   assign
 
