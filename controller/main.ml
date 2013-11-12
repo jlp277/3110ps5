@@ -17,5 +17,5 @@ let _ =
       Dynlink.loadfile_private app_path
     with
     | Dynlink.Error ex as e -> 
-        print_endline (Dynlink.error_message ex);
+        print_endline ("lol");
         raise e
