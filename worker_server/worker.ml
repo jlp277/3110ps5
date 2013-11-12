@@ -82,4 +82,4 @@ let rec handle_request client =
       end
   | None ->
       Connection.close client;
-      print_endline "Connection lost while waiting for request. LOLOLLJLHFLKJDLFJIOEHFNKJKJHDKLJSDLKJFKLSDJFLJIOFIJDKLFJ"
+      print_endline "Connection lost while waiting for request." 
