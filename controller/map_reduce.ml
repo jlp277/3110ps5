@@ -19,6 +19,8 @@ let rt_mutex = Mutex.create ()
 let rr_mutex = Mutex.create ()
 let rf_mutex = Mutex.create ()
 
+als;dkfj;lasdjf;lkasdjf;lkasjdf;klajsd;lfja;lkasjdf;list
+
 let hash_print table = 
   let tablestring = Hashtbl.fold (fun k v init -> "("^(Util.marshal k)^", "^(Util.marshal v)^") "^init) table "" in
   print_endline tablestring
