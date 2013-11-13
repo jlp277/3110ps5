@@ -70,7 +70,6 @@ let combine kv_pairs : (string * string list) list =
     else
       Hashtbl.add combined k [v] in
   List.iter build_combtable kv_pairs;
-  print_endline "combining";
   Hashtbl.fold (fun k v init -> (k,v)::init) combined []
 
 let reduce kvs_pairs reduce_filename : (string * string list) list =
