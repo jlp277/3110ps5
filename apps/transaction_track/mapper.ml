@@ -6,8 +6,8 @@ let num_in : int = ref -1
 let num_out : int = ref -1
 
 let results : (string * string) list = ref []
-let (key, value) = Program.get_input() in
-let block = List.map (String.lowercase (Util.split_spaces value)) in
+let (key,value) = Program.get_input()
+let block = List.map (String.lowercase (Util.split_spaces value))
 let parse () =
   num_trans :=
     match block with
@@ -43,5 +43,5 @@ let parse () =
     done;
     num_trans := !num_trans - 1;
   done;
-  !results in
+  !results
 Program.set_output(parse ())

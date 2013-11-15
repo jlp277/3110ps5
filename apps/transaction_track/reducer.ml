@@ -9,7 +9,7 @@ let comp (key,amt) (key',amt') =
   else if key < key' then -1
   else 0 in
 
-let (key, values) = Program.get_input() in
+let (key, values : int*int) = Program.get_input() in
 let sort_values = List.sort comp values in
 
 let rec  get_total vals =
