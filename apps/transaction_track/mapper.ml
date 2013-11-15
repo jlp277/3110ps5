@@ -44,4 +44,4 @@ let parse () =
     num_trans := !num_trans - 1;
   done;
   !results in
-parse ()
+Program.set_output(parse ())
